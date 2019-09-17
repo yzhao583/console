@@ -71,5 +71,239 @@ export enum FLAGS {
   CONSOLE_CLI_DOWNLOAD = 'CONSOLE_CLI_DOWNLOAD',
   CONSOLE_NOTIFICATION = 'CONSOLE_NOTIFICATION',
   CONSOLE_EXTERNAL_LOG_LINK = 'CONSOLE_EXTERNAL_LOG_LINK',
-  BAREMETAL = 'BAREMETAL',
+}
+
+export const TEST_FIELDS = [
+  {
+    "path": "commonConfig.version",
+    "displayName": "Version",
+    "description": "Product version installed.",
+    "type": null,
+    "required": false,
+    "validation": null,
+    "capabilities": [
+      "urn:alm:descriptor:com.tectonic.ui:label"
+    ]
+  },
+  {
+    "path": "pod.resources",
+    "displayName": "Resource quotas",
+    "description": "Limits describes the minimum/maximum amount",
+    "type": null,
+    "required": false,
+    "validation": null,
+    "capabilities": [
+      "urn:alm:descriptor:com.tectonic.ui:resourceRequirements"
+    ]
+  },
+  {
+    "path": "k8resourcetest",
+    "displayName": "k8resource prefix test",
+    "description": "Limits describes the minimum/maximum amount",
+    "type": null,
+    "required": false,
+    "validation": null,
+    "capabilities": [
+      "urn:alm:descriptor:io.kubernetes:testgroup"
+    ]
+  },
+  {
+    "path": "checkboxtest",
+    "displayName": "checkbox test",
+    "description": "Limits describes the minimum/maximum amount",
+    "type": null,
+    "required": false,
+    "validation": null,
+    "capabilities": [
+      "urn:alm:descriptor:com.tectonic.ui:checkbox"
+    ]
+  },
+  {
+    "path": "imagepullpolicytest",
+    "displayName": "image pull policy test",
+    "description": "Limits describes the minimum/maximum amount",
+    "type": null,
+    "required": true,
+    "validation": null,
+    "capabilities": [
+      "urn:alm:descriptor:com.tectonic.ui:imagePullPolicy"
+    ]
+  },
+  {
+    "path": "updatestrategytest",
+    "displayName": "update strategy test",
+    "description": "Limits describes the minimum/maximum amount",
+    "type": null,
+    "required": false,
+    "validation": null,
+    "capabilities": [
+      "urn:alm:descriptor:com.tectonic.ui:updateStrategy"
+    ]
+  },
+  {
+    "path": "selectortest",
+    "displayName": "selector test",
+    "description": "Limits describes the minimum/maximum amount",
+    "type": null,
+    "required": false,
+    "validation": null,
+    "capabilities": [
+      "urn:alm:descriptor:com.tectonic.ui:selector:"
+    ]
+  },
+  {
+    "path": "namespaceselectortest",
+    "displayName": "namespace selector test",
+    "description": "Limits describes the minimum/maximum amount",
+    "type": null,
+    "required": false,
+    "validation": null,
+    "capabilities": [
+      "urn:alm:descriptor:com.tectonic.ui:namespaceSelector"
+    ]
+  },
+  {
+    "path": "nodeaffinitytest",
+    "displayName": "node affinity test",
+    "description": "Limits describes the minimum/maximum amount",
+    "type": null,
+    "required": false,
+    "validation": null,
+    "capabilities": [
+      "urn:alm:descriptor:com.tectonic.ui:nodeAffinity"
+    ]
+  },
+  {
+    "path": "podaffinitytest",
+    "displayName": "pod affinity test",
+    "description": "Limits describes the minimum/maximum amount",
+    "type": null,
+    "required": false,
+    "validation": null,
+    "capabilities": [
+      "urn:alm:descriptor:com.tectonic.ui:podAffinity"
+    ]
+  },
+  {
+    "path": "endpointlisttest",
+    "displayName": "end points test",
+    "description": "Limits describes the minimum/maximum amount",
+    "type": null,
+    "required": false,
+    "validation": null,
+    "capabilities": [
+      "urn:alm:descriptor:com.tectonic.ui:endpointList"
+    ]
+  }
+]
+
+export const TEST_DROPDOWN_ITEMS = {
+  "builder-dockercfg-pvftq-Secret": {
+    "kindLabel": "Secret",
+    "name": "builder-dockercfg-pvftq"
+  },
+  "builder-token-2fj89-Secret": {
+    "kindLabel": "Secret",
+    "name": "builder-token-2fj89"
+  },
+  "builder-token-h24vx-Secret": {
+    "kindLabel": "Secret",
+    "name": "builder-token-h24vx"
+  },
+  "business-automation-operator-dockercfg-bg7wc-Secret": {
+    "kindLabel": "Secret",
+    "name": "business-automation-operator-dockercfg-bg7wc"
+  },
+  "business-automation-operator-token-rt5cr-Secret": {
+    "kindLabel": "Secret",
+    "name": "business-automation-operator-token-rt5cr"
+  },
+  "business-automation-operator-token-v6b2p-Secret": {
+    "kindLabel": "Secret",
+    "name": "business-automation-operator-token-v6b2p"
+  },
+  "console-cr-form-dockercfg-kcljv-Secret": {
+    "kindLabel": "Secret",
+    "name": "console-cr-form-dockercfg-kcljv"
+  },
+  "console-cr-form-token-bz8hv-Secret": {
+    "kindLabel": "Secret",
+    "name": "console-cr-form-token-bz8hv"
+  },
+  "console-cr-form-token-whkjq-Secret": {
+    "kindLabel": "Secret",
+    "name": "console-cr-form-token-whkjq"
+  },
+  "default-dockercfg-vjz4s-Secret": {
+    "kindLabel": "Secret",
+    "name": "default-dockercfg-vjz4s"
+  },
+  "default-token-9c5j6-Secret": {
+    "kindLabel": "Secret",
+    "name": "default-token-9c5j6"
+  },
+  "default-token-wbwgd-Secret": {
+    "kindLabel": "Secret",
+    "name": "default-token-wbwgd"
+  },
+  "deployer-dockercfg-lzzwf-Secret": {
+    "kindLabel": "Secret",
+    "name": "deployer-dockercfg-lzzwf"
+  },
+  "deployer-token-bwpmw-Secret": {
+    "kindLabel": "Secret",
+    "name": "deployer-token-bwpmw"
+  },
+  "deployer-token-nfvbf-Secret": {
+    "kindLabel": "Secret",
+    "name": "deployer-token-nfvbf"
+  },
+  "prometheus-k8s-dockercfg-q8l6n-Secret": {
+    "kindLabel": "Secret",
+    "name": "prometheus-k8s-dockercfg-q8l6n"
+  },
+  "prometheus-k8s-token-kkx24-Secret": {
+    "kindLabel": "Secret",
+    "name": "prometheus-k8s-token-kkx24"
+  },
+  "prometheus-k8s-token-vczph-Secret": {
+    "kindLabel": "Secret",
+    "name": "prometheus-k8s-token-vczph"
+  },
+  "prometheus-operator-0-27-0-dockercfg-m8l5l-Secret": {
+    "kindLabel": "Secret",
+    "name": "prometheus-operator-0-27-0-dockercfg-m8l5l"
+  },
+  "prometheus-operator-0-27-0-token-kmjls-Secret": {
+    "kindLabel": "Secret",
+    "name": "prometheus-operator-0-27-0-token-kmjls"
+  },
+  "prometheus-operator-0-27-0-token-lnckk-Secret": {
+    "kindLabel": "Secret",
+    "name": "prometheus-operator-0-27-0-token-lnckk"
+  },
+  "proxy-tls-Secret": {
+    "kindLabel": "Secret",
+    "name": "proxy-tls"
+  },
+  "ssk-businesscentral-app-secret-Secret": {
+    "kindLabel": "Secret",
+    "name": "ssk-businesscentral-app-secret"
+  },
+  "ssk-kieserver-app-secret-Secret": {
+    "kindLabel": "Secret",
+    "name": "ssk-kieserver-app-secret"
+  },
+  "ssk-rhpamsvc-dockercfg-2gv8c-Secret": {
+    "kindLabel": "Secret",
+    "name": "ssk-rhpamsvc-dockercfg-2gv8c"
+  },
+  "ssk-rhpamsvc-token-5x8gv-Secret": {
+    "kindLabel": "Secret",
+    "name": "ssk-rhpamsvc-token-5x8gv"
+  },
+  "ssk-rhpamsvc-token-gsr5x-Secret": {
+    "kindLabel": "Secret",
+    "name": "ssk-rhpamsvc-token-gsr5x"
+  }
 }
