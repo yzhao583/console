@@ -1,4 +1,5 @@
 import * as _ from 'lodash-es';
+import * as semver from 'semver';
 
 import { ClusterVersionModel } from '../../models';
 import { referenceForModel } from './k8s';
@@ -96,6 +97,29 @@ export const getOpenShiftVersion = (cv: ClusterVersionKind): string => {
   return lastUpdate.state === 'Partial' ? `Updating to ${lastUpdate.version}` : lastUpdate.version;
 };
 
+// example link: https://access.redhat.com/downloads/content/290/ver=4.1/rhel---7/4.1.13/x86_64/product-errata
+export const getErrataLink = (cv: ClusterVersionKind): string => {
+  const version: string = _.get(cv, 'status.history[0].version');
+  if (!version) {
+    return null;
+  }
+
+  const parsed = semver.parse(version);
+  if (!parsed) {
+    return null;
+  }
+
+  const { major, minor, patch, prerelease } = parsed;
+  if (major !== 4 || !_.isEmpty(prerelease)) {
+    return null;
+  }
+
+  // TODO: Determine architecture instead of assuming x86_64.
+  return `https://access.redhat.com/downloads/content/290/ver=${major}.${minor}/rhel---7/${major}.${minor}.${patch}/x86_64/product-errata`;
+};
+
 export const getClusterName = (): string => window.SERVER_FLAGS.kubeAPIServerURL || null;
 
 export const getClusterID = (cv: ClusterVersionKind): string => _.get(cv, 'spec.clusterID');
+
+export const getOCMLink = (clusterID: string): string => `https://cloud.redhat.com/openshift/details/${clusterID}`;

@@ -9,13 +9,13 @@ import { k8sCreate } from '@console/internal/module/k8s';
 import { PipelineRunModel } from '../../../models';
 import { Pipeline, PipelineResource, Param, PipelineRun } from '../../../utils/pipeline-augment';
 import StartPipelineForm from './StartPipelineForm';
-import { validationSchema } from './pipelineForm-validation-utils';
+import { startPipelineSchema } from './pipelineForm-validation-utils';
 
-export type newPipelineRun = (Pipeline: Pipeline, latestRun: PipelineRun) => {};
+export type newPipelineRunData = (Pipeline: Pipeline, latestRun?: PipelineRun) => {};
 
 export interface StartPipelineModalProps {
   pipeline: Pipeline;
-  getNewPipelineRun: newPipelineRun;
+  getPipelineRunData: newPipelineRunData;
   onSubmit?: (pipelineRun: PipelineRun) => void;
 }
 export interface StartPipelineFormValues extends FormikValues {
@@ -26,7 +26,7 @@ export interface StartPipelineFormValues extends FormikValues {
 
 const StartPipelineModal: React.FC<StartPipelineModalProps & ModalComponentProps> = ({
   pipeline,
-  getNewPipelineRun,
+  getPipelineRunData,
   close,
   onSubmit,
 }) => {
@@ -53,7 +53,7 @@ const StartPipelineModal: React.FC<StartPipelineModalProps & ModalComponentProps
         },
       },
     };
-    k8sCreate(PipelineRunModel, getNewPipelineRun(pipeline, pipelineRunData))
+    k8sCreate(PipelineRunModel, getPipelineRunData(pipeline, pipelineRunData))
       .then((res) => {
         actions.setSubmitting(false);
         onSubmit && onSubmit(res);
@@ -69,9 +69,8 @@ const StartPipelineModal: React.FC<StartPipelineModalProps & ModalComponentProps
   return (
     <Formik
       initialValues={initialValues}
-      initialStatus={{ subFormsOpened: 0 }}
       onSubmit={handleSubmit}
-      validationSchema={validationSchema}
+      validationSchema={startPipelineSchema}
       render={(props) => <StartPipelineForm {...props} close={close} />}
     />
   );

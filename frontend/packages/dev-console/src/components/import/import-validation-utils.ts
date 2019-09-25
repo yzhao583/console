@@ -66,7 +66,7 @@ export const validationSchema = yup.object().shape({
       .min(0, 'Replicas must be greater than or equal to 0.')
       .max(
         Number.MAX_SAFE_INTEGER,
-        `Replicas must be lesser than or equal to ${Number.MAX_SAFE_INTEGER}`,
+        `Replicas must be lesser than or equal to ${Number.MAX_SAFE_INTEGER}.`,
       )
       .test({
         name: 'isEmpty',
@@ -86,7 +86,7 @@ export const validationSchema = yup.object().shape({
           .min(0, 'Min Pods must be greater than or equal to 0.')
           .max(
             Number.MAX_SAFE_INTEGER,
-            `Min Pods must be lesser than or equal to ${Number.MAX_SAFE_INTEGER}`,
+            `Min Pods must be lesser than or equal to ${Number.MAX_SAFE_INTEGER}.`,
           ),
         maxpods: yup
           .number()
@@ -95,7 +95,7 @@ export const validationSchema = yup.object().shape({
           .min(1, 'Max Pods must be greater than or equal to 1.')
           .max(
             Number.MAX_SAFE_INTEGER,
-            `Max Pods must be lesser than or equal to ${Number.MAX_SAFE_INTEGER}`,
+            `Max Pods must be lesser than or equal to ${Number.MAX_SAFE_INTEGER}.`,
           )
           .test({
             test(limit) {
@@ -111,7 +111,7 @@ export const validationSchema = yup.object().shape({
           .min(0, 'Concurrency Target must be greater than or equal to 0.')
           .max(
             Number.MAX_SAFE_INTEGER,
-            `Concurrency Target must be lesser than or equal to ${Number.MAX_SAFE_INTEGER}`,
+            `Concurrency Target must be lesser than or equal to ${Number.MAX_SAFE_INTEGER}.`,
           ),
         concurrencylimit: yup
           .number()
@@ -120,7 +120,7 @@ export const validationSchema = yup.object().shape({
           .min(0, 'Concurrency Limit must be greater than or equal to 0.')
           .max(
             Number.MAX_SAFE_INTEGER,
-            `Concurrency Limit must be lesser than or equal to ${Number.MAX_SAFE_INTEGER}`,
+            `Concurrency Limit must be lesser than or equal to ${Number.MAX_SAFE_INTEGER}.`,
           ),
       }),
     }),
@@ -149,12 +149,12 @@ export const validationSchema = yup.object().shape({
     cpu: yup.object().shape({
       request: yup
         .number()
-        .nullable()
+        .transform((request) => (_.isNaN(request) ? undefined : request))
         .min(0, 'Request must be greater than or equal to 0.')
         .test({
           test(request) {
             const { requestUnit, limit, limitUnit } = this.parent;
-            if (limit !== null) {
+            if (limit !== undefined) {
               return (
                 convertToBaseValue(`${request}${requestUnit}`) <=
                 convertToBaseValue(`${limit}${limitUnit}`)
@@ -168,12 +168,12 @@ export const validationSchema = yup.object().shape({
       limitUnit: yup.string('Unit must be millicores or cores.'),
       limit: yup
         .number()
-        .nullable()
+        .transform((limit) => (_.isNaN(limit) ? undefined : limit))
         .min(0, 'Limit must be greater than or equal to 0.')
         .test({
           test(limit) {
             const { request, requestUnit, limitUnit } = this.parent;
-            if (limit !== null) {
+            if (limit !== undefined) {
               return (
                 convertToBaseValue(`${limit}${limitUnit}`) >=
                 convertToBaseValue(`${request}${requestUnit}`)
@@ -187,12 +187,12 @@ export const validationSchema = yup.object().shape({
     memory: yup.object().shape({
       request: yup
         .number()
-        .nullable()
+        .transform((request) => (_.isNaN(request) ? undefined : request))
         .min(0, 'Request must be greater than or equal to 0.')
         .test({
           test(request) {
             const { requestUnit, limit, limitUnit } = this.parent;
-            if (limit !== null) {
+            if (limit !== undefined) {
               return (
                 convertToBaseValue(`${request}${requestUnit}`) <=
                 convertToBaseValue(`${limit}${limitUnit}`)
@@ -205,12 +205,12 @@ export const validationSchema = yup.object().shape({
       requestUnit: yup.string('Unit must be Mi or Gi.'),
       limit: yup
         .number()
-        .nullable()
+        .transform((limit) => (_.isNaN(limit) ? undefined : limit))
         .min(0, 'Limit must be greater than or equal to 0.')
         .test({
           test(limit) {
             const { request, requestUnit, limitUnit } = this.parent;
-            if (limit !== null) {
+            if (limit !== undefined) {
               return (
                 convertToBaseValue(`${request}${requestUnit}`) <=
                 convertToBaseValue(`${limit}${limitUnit}`)
