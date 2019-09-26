@@ -38,7 +38,7 @@ import { CreateYAML } from '../create-yaml';
 import { RadioGroup } from '../radio';
 import { ConfigureUpdateStrategy } from '../modals/configure-update-strategy-modal';
 import { NodeAffinity, PodAffinity, defaultNodeAffinity, defaultPodAffinity } from './descriptors/spec/affinity';
-import { ExpandableSection } from '../../components/utils/expandable-section';
+import { FieldGroup } from './descriptors/spec/field-group';
 
 const annotationKey = 'alm-examples';
 
@@ -146,7 +146,6 @@ const fieldsForOpenAPI = (openAPI: SwaggerDefinition): OperandField[] => {
 };
 
 export const CreateOperandForm: React.FC<CreateOperandFormProps> = (props) => {
-  console.log(props);
   const fields: OperandField[] = (!_.isEmpty(props.clusterServiceVersion)
     ? fieldsFor(props.providedAPI)
     : [])
@@ -170,7 +169,6 @@ export const CreateOperandForm: React.FC<CreateOperandFormProps> = (props) => {
       ? {...field, capabilities: [...new Set(field.capabilities).add(SpecCapability.fieldGroup.concat(field.path.split('.')[0]) as SpecCapability.fieldGroup)]}
       : field);
 
-  console.log(fields);
   const defaultValueFor = (field: OperandField) => {
     if (_.intersection(
       field.capabilities,
@@ -219,14 +217,6 @@ export const CreateOperandForm: React.FC<CreateOperandFormProps> = (props) => {
   const [formValues, setFormValues] = React.useState<FormValues>({'metadata.name': 'example', 'metadata.labels': [], ...defaultFormValues, ...sampleFormValues});
   const [error, setError] = React.useState<string>();
   const [formErrors, setFormErrors] = React.useState<FieldErrors>({});
-  const [currentExpandedSectionId, setCurrentExpandedSectionId] = React.useState("name");
-
-  const onExpandableSectionToggle = (event, data) => {
-    event.preventDefault();
-    let newExpandedSectionId = currentExpandedSectionId === data ? null : data;
-
-    setCurrentExpandedSectionId(newExpandedSectionId);
-  }
 
   const updateFormValues = (values: FormValues) => (path: PropertyPath, value: any) => _.set(_.cloneDeep(values), path, value);
 
@@ -280,7 +270,6 @@ export const CreateOperandForm: React.FC<CreateOperandFormProps> = (props) => {
         spec: _.reduce(specValues, (spec, value, path) => _.set(spec, path, value), _.get(props.sample, 'spec', {})),
       } as K8sResourceKind;
 
-      console.log(obj);
       k8sCreate(props.operandModel, obj)
         .then(() => history.push(`${resourcePathFromModel(ClusterServiceVersionModel, props.clusterServiceVersion.metadata.name, props.namespace)}/${referenceForModel(props.operandModel)}/${obj.metadata.name}`))
         .catch((err: {json: Status}) => {
@@ -425,12 +414,19 @@ export const CreateOperandForm: React.FC<CreateOperandFormProps> = (props) => {
     return null;
   };
 
+  const getGroupName = (group, groupType) => {
+    if (!_.isString(group) || !_.isString(groupType)) {
+      return null;
+    } else {
+      let groupInfoList = group.split(groupType)[1].split(':');
+      return _.startCase(groupInfoList[0]);
+    }
+  }
+
   const fieldGroups = fields.reduce((groups, field) => field.capabilities.find(c => c.startsWith(SpecCapability.fieldGroup))
     ? groups.add(field.capabilities.find(c => c.startsWith(SpecCapability.fieldGroup)) as SpecCapability.fieldGroup)
     : groups,
   new Set<SpecCapability.fieldGroup>());
-
-  console.log(fieldGroups);
 
   const arrayFieldGroups = fields.reduce((groups, field) => field.capabilities.find(c => c.startsWith(SpecCapability.arrayFieldGroup))
     ? groups.add(field.capabilities.find(c => c.startsWith(SpecCapability.arrayFieldGroup)) as SpecCapability.arrayFieldGroup)
@@ -442,112 +438,72 @@ export const CreateOperandForm: React.FC<CreateOperandFormProps> = (props) => {
 
   useScrollToTopOnMount();
 
-  type FieldGroupProps = {
-    defaultExpand: boolean;
-    group: SpecCapability.fieldGroup;
-  };
-
-  const FieldGroup: React.FC<FieldGroupProps> = ({group, defaultExpand}) => {
-    const [expand, setExpand] = React.useState<boolean>(defaultExpand);
-
-    return <div key={group} id={group}>
-      <div className="co-operand-field-group-title">
-        <label className="form-label">{_.startCase(group.split(SpecCapability.fieldGroup)[1])}</label>
-        <button className="btn btn-link" type="button" onClick={() => setExpand(!expand)}>{expand ? 'Collapse' : 'Expand'}</button>
-      </div>
-      <div className="co-operand-field-group">
-        { expand && fields
-          .filter(f => f.capabilities.includes(group))
-          .filter(f => !_.isNil(inputFor(f))).map(field => <div key={field.path}>
-            <div className="form-group co-create-operand__form-group">
-              <label className={classNames('form-label', {'co-required': field.required})} htmlFor={field.path}>{field.displayName}</label>
-              { inputFor(field) }
-              { field.description && <span id={`${field.path}__description`} className="help-block text-muted">{field.description}</span> }
-              { formErrors[field.path] && <span className="co-error">{formErrors[field.path]}</span> }
-            </div>
-          </div>) }
-      </div>
-    </div>;
-  };
-  FieldGroup.displayName = 'FieldGroup';
-
   return <div className="co-m-pane__body">
     <form onSubmit={submit} className="col-md-6">
       <Accordion asDefinitionList={false}>
-        <ExpandableSection id="name" isExpanded={currentExpandedSectionId === "name"} listTitle="Name" onToggle={onExpandableSectionToggle}>
-          <div className="row">
-            <div className="form-group">
-              <label className="control-label co-required" htmlFor="name">Name</label>
-              <input
-                className="pf-c-form-control"
-                type="text"
-                onChange={({target}) => setFormValues(values => ({...values, 'metadata.name': target.value}))}                
-                value={formValues['metadata.name']}
-                id="metadata.name"
-                required />
-            </div>
-            <hr className="pf-c-divider"></hr>
-          </div>
-        </ExpandableSection>
-
-        <ExpandableSection id="labels" isExpanded={currentExpandedSectionId === "labels"} listTitle="Labels" onToggle={onExpandableSectionToggle}>
-          <div className="row">
-            <div className="form-group">
-              <label className="control-label" htmlFor="tags-input">Labels</label>
-              <SelectorInput onChange={labels => setFormValues(values => ({...values, 'metadata.labels': labels}))} tags={formValues['metadata.labels']} />
-            </div>
-            <hr className="pf-c-divider"></hr>
-          </div>
-        </ExpandableSection>
-
-        { [...arrayFieldGroups].map(group =>
-          <ExpandableSection id={group} isExpanded={currentExpandedSectionId === group} listTitle={_.startCase(group.split(SpecCapability.arrayFieldGroup)[1])} onToggle={onExpandableSectionToggle}>
-            <div key={group} className="row">
-              <label className="form-label">{_.startCase(group.split(SpecCapability.arrayFieldGroup)[1])}</label>
-              <div className="co-operand-field-group">
-                { fields.filter(f => f.capabilities.includes(group))
-                  .filter(f => !_.isNil(inputFor(f))).map(field => <div key={field.path}>
+        <div className="form-group pf-c-form__group--with-padding">
+          <label className="control-label co-required" htmlFor="name">Name</label>
+          <input
+            className="pf-c-form-control"
+            type="text"
+            onChange={({ target }) => setFormValues(values => ({ ...values, 'metadata.name': target.value }))}
+            value={formValues['metadata.name']}
+            id="metadata.name"
+            required />
+        </div>
+        <hr className="pf-c-divider"></hr>
+        <div className="form-group pf-c-form__group--with-padding">
+          <label className="control-label" htmlFor="tags-input">Labels</label>
+          <SelectorInput onChange={labels => setFormValues(values => ({ ...values, 'metadata.labels': labels }))} tags={formValues['metadata.labels']} />
+        </div>
+        <hr className="pf-c-divider"></hr>
+        {[...arrayFieldGroups].map(group => {
+          let groupName = getGroupName(group, SpecCapability.arrayFieldGroup);
+          let fieldList = fields.filter(f => f.capabilities.includes(group)).filter(f => !_.isNil(inputFor(f)));
+          return <div id={group} key={group}>
+            <FieldGroup defaultExpand={group.split(SpecCapability.arrayFieldGroup)[1].split(':').includes('expand')} groupName={groupName}>
+              <div key={group} className="row">
+                <label className="form-label">{groupName}</label>
+                <div className="co-operand-field-group">
+                  {fieldList.map(field => <div key={field.path}>
                     <div className="form-group co-create-operand__form-group">
-                      <label className={classNames('form-label', {'co-required': field.required})} htmlFor={field.path}>{field.displayName}</label>
-                      { inputFor(field) }
-                      { field.description && <span id={`${field.path}__description`} className="help-block text-muted">{field.description}</span> }
-                      { formErrors[field.path] && <span className="co-error">{formErrors[field.path]}</span> }
+                      <label className={classNames('form-label', { 'co-required': field.required })} htmlFor={field.path}>{field.displayName}</label>
+                      {inputFor(field)}
+                      {field.description && <span id={`${field.path}__description`} className="help-block text-muted">{field.description}</span>}
+                      {formErrors[field.path] && <span className="co-error">{formErrors[field.path]}</span>}
                     </div>
-                  </div>) }
+                  </div>)}
+                </div>
+                <hr className="pf-c-divider"></hr>
               </div>
-              <hr className="pf-c-divider"></hr>
-            </div>
-          </ExpandableSection>
-        )}
-        {/* { [...fieldGroups].map(group => <div key={group} id={group}>
-          <FieldGroup
-            group={group}
-            defaultExpand={_.every(fields.filter(f => f.capabilities.includes(SpecCapability.fieldGroup.concat(group) as SpecCapability.fieldGroup)),
-              f => f.capabilities.includes(SpecCapability.advanced) && !f.required)} />
-        </div>) } */}
-        { [...fieldGroups].map(group =>
-          <ExpandableSection id={group} isExpanded={currentExpandedSectionId === group} listTitle={_.startCase(group.split(SpecCapability.fieldGroup)[1])} onToggle={onExpandableSectionToggle}>
-            <div key={group} className="row">
-              <label className="form-label">{_.startCase(group.split(SpecCapability.fieldGroup)[1])}</label>
-              <div className="co-operand-field-group">
-                { fields.filter(f => f.capabilities.includes(group))
-                  .filter(f => !_.isNil(inputFor(f))).map(field => <div key={field.path}>
+            </FieldGroup>
+          </div>
+        })}
+        {[...fieldGroups].map(group => {
+          let groupName = getGroupName(group, SpecCapability.fieldGroup);
+          let fieldList = fields.filter(f => f.capabilities.includes(group)).filter(f => !_.isNil(inputFor(f)));
+          return <div id={group} key={group}>
+            <FieldGroup defaultExpand={group.split(SpecCapability.fieldGroup)[1].split(':').includes('expand')} groupName={groupName}>
+              <div key={group} className="row">
+                <label className="form-label">{groupName}</label>
+                <div className="co-operand-field-group">
+                  {fieldList.map(field => <div key={field.path}>
                     <div className="form-group co-create-operand__form-group">
-                      <label className={classNames('form-label', {'co-required': field.required})} htmlFor={field.path}>{field.displayName}</label>
-                      { inputFor(field) }
-                      { field.description && <span id={`${field.path}__description`} className="help-block text-muted">{field.description}</span> }
-                      { formErrors[field.path] && <span className="co-error">{formErrors[field.path]}</span> }
+                      <label className={classNames('form-label', { 'co-required': field.required })} htmlFor={field.path}>{field.displayName}</label>
+                      {inputFor(field)}
+                      {field.description && <span id={`${field.path}__description`} className="help-block text-muted">{field.description}</span>}
+                      {formErrors[field.path] && <span className="co-error">{formErrors[field.path]}</span>}
                     </div>
-                  </div>) }
+                  </div>)}
+                </div>
+                <hr className="pf-c-divider"></hr>
               </div>
-              <hr className="pf-c-divider"></hr>
-            </div>
-          </ExpandableSection>
-        )}
+            </FieldGroup>
+          </div>;
+        })}
         { fields.filter(f => !f.capabilities.some(c => c.startsWith(SpecCapability.fieldGroup) || c.startsWith(SpecCapability.arrayFieldGroup)))
           .filter(f => !f.capabilities.includes(SpecCapability.advanced))
           .filter(f => !_.isNil(inputFor(f))).map(field => 
-          <ExpandableSection id={field.path} isExpanded={currentExpandedSectionId === field.path} listTitle={field.displayName} onToggle={onExpandableSectionToggle}>
             <div key={field.path}>
               <div className="form-group co-create-operand__form-group">
                 <label className={classNames('form-label', {'co-required': field.required})} htmlFor={field.path}>{field.displayName}</label>
@@ -556,10 +512,8 @@ export const CreateOperandForm: React.FC<CreateOperandFormProps> = (props) => {
                 { formErrors[field.path] && <span className="co-error">{formErrors[field.path]}</span> }
               </div>
             </div>
-          </ExpandableSection>
           ) }
         { advancedFields.length > 0 && <div>
-          <ExpandableSection id="advancedConfiguration" isExpanded={currentExpandedSectionId === "advancedConfiguration"} listTitle="Advanced Configuration" onToggle={onExpandableSectionToggle}>
             {advancedFields.filter(f => !_.isNil(inputFor(f))).map(field =>
               <div key={field.path}>
                 <div className="form-group co-create-operand__form-group">
@@ -570,7 +524,6 @@ export const CreateOperandForm: React.FC<CreateOperandFormProps> = (props) => {
                 </div>
               </div>
             )}
-          </ExpandableSection>
         </div> }
       </Accordion>
       {(!_.isEmpty(error) || !_.isEmpty(_.compact(_.values(formErrors)))) && <div className="row">
