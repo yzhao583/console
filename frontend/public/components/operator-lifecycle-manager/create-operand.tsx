@@ -38,6 +38,7 @@ import { RadioGroup } from '../radio';
 import { ConfigureUpdateStrategy } from '../modals/configure-update-strategy-modal';
 import { NodeAffinity, PodAffinity, defaultNodeAffinity, defaultPodAffinity } from './descriptors/spec/affinity';
 import { FieldGroup } from './descriptors/spec/field-group';
+import { FIELDGROUP_EXPAND } from '../../const';
 
 const annotationKey = 'alm-examples';
 
@@ -349,6 +350,7 @@ export const CreateOperandForm: React.FC<CreateOperandFormProps> = (props) => {
     if (field.capabilities.includes(SpecCapability.booleanSwitch)) {
       return <div>
         <Switch
+          id={field.path}
           isChecked={formValues[field.path]}
           onChange={(val) => setFormValues(values => ({ ...values, [field.path]: val }))}
           label="True"
@@ -430,10 +432,28 @@ export const CreateOperandForm: React.FC<CreateOperandFormProps> = (props) => {
     : groups,
   new Set<SpecCapability.fieldGroup>());
 
+  //if 'urn:alm:descriptor:com.tectonic.ui:fieldGroup:example:expand' and 'urn:alm:descriptor:com.tectonic.ui:fieldGroup:example' exist, remove 'urn:alm:descriptor:com.tectonic.ui:fieldGroup:example'.
+  fieldGroups.forEach((groupValue, groupKey, groups) => {
+    let groupWithExpandStatus = groupValue.startsWith(SpecCapability.fieldGroup) && groupValue.endsWith(FIELDGROUP_EXPAND) ? groupValue : undefined;
+    let groupWithoutExpandStatus = groupWithExpandStatus ? _.dropRight(groupWithExpandStatus.split(':')).join(':') as SpecCapability.fieldGroup : undefined;
+    if(groupWithExpandStatus && groups.has(groupWithoutExpandStatus)){
+      groups.delete(groupWithoutExpandStatus);
+    }
+  });
+
   const arrayFieldGroups = fields.reduce((groups, field) => field.capabilities.find(c => c.startsWith(SpecCapability.arrayFieldGroup))
     ? groups.add(field.capabilities.find(c => c.startsWith(SpecCapability.arrayFieldGroup)) as SpecCapability.arrayFieldGroup)
     : groups,
   new Set<SpecCapability.arrayFieldGroup>());
+
+  //if 'urn:alm:descriptor:com.tectonic.ui:arrayFieldGroup:example:expand' and 'urn:alm:descriptor:com.tectonic.ui:arrayFieldGroup:example' exist, remove 'urn:alm:descriptor:com.tectonic.ui:arrayFieldGroup:example'.
+  arrayFieldGroups.forEach((groupValue, groupKey, groups) => {
+    let groupWithExpandStatus = groupValue.startsWith(SpecCapability.arrayFieldGroup) && groupValue.endsWith(FIELDGROUP_EXPAND) ? groupValue : undefined;
+    let groupWithoutExpandStatus = groupWithExpandStatus ? _.dropRight(groupWithExpandStatus.split(':')).join(':') as SpecCapability.arrayFieldGroup : undefined;
+    if(groupWithExpandStatus && groups.has(groupWithoutExpandStatus)){
+      groups.delete(groupWithoutExpandStatus);
+    }
+  });
 
   const advancedFields = fields.filter(f => !f.capabilities.some(c => c.startsWith(SpecCapability.fieldGroup) || c.startsWith(SpecCapability.arrayFieldGroup)))
     .filter(f => f.capabilities.includes(SpecCapability.advanced));
@@ -462,8 +482,15 @@ export const CreateOperandForm: React.FC<CreateOperandFormProps> = (props) => {
         {[...arrayFieldGroups].map(group => {
           let groupName = getGroupName(group, SpecCapability.arrayFieldGroup);
           let fieldList = fields.filter(f => f.capabilities.includes(group)).filter(f => !_.isNil(inputFor(f)));
+          let groupWithoutExpandStatus = group.startsWith(SpecCapability.arrayFieldGroup) && group.endsWith(FIELDGROUP_EXPAND) ? _.dropRight(group.split(':')).join(':') as SpecCapability.arrayFieldGroup : undefined;
+  
+          //if 'urn:alm:descriptor:com.tectonic.ui:arrayFieldGroup:example:expand' and 'urn:alm:descriptor:com.tectonic.ui:arrayFieldGroup:example' exist, get all fields whose x-descriptor contain 'urn:alm:descriptor:com.tectonic.ui:arrayFieldGroup:example'.        
+          if(group.startsWith(SpecCapability.arrayFieldGroup) && group.endsWith(FIELDGROUP_EXPAND)){
+            fieldList = fieldList.concat(fields.filter(f => f.capabilities.includes(groupWithoutExpandStatus)).filter(f => !_.isNil(inputFor(f))));
+          }
+
           return <div id={group} key={group}>
-            <FieldGroup defaultExpand={group.split(SpecCapability.arrayFieldGroup)[1].split(':').includes('expand')} groupName={groupName}>
+            <FieldGroup defaultExpand={group.split(SpecCapability.arrayFieldGroup)[1].split(':').includes(FIELDGROUP_EXPAND)} groupName={groupName}>
               <div key={group} className="row">
                 <label className="form-label">{groupName}</label>
                 <div className="co-operand-field-group">
@@ -481,11 +508,18 @@ export const CreateOperandForm: React.FC<CreateOperandFormProps> = (props) => {
             <hr className="pf-c-divider" />
           </div>
         })}
-        {[...fieldGroups].map(group => {
+        {[...fieldGroups].map((group) => {
           let groupName = getGroupName(group, SpecCapability.fieldGroup);
           let fieldList = fields.filter(f => f.capabilities.includes(group)).filter(f => !_.isNil(inputFor(f)));
+          let groupWithoutExpandStatus = group.startsWith(SpecCapability.fieldGroup) && group.endsWith(FIELDGROUP_EXPAND) ? _.dropRight(group.split(':')).join(':') as SpecCapability.fieldGroup : undefined;
+
+          //if 'urn:alm:descriptor:com.tectonic.ui:fieldGroup:example:expand' and 'urn:alm:descriptor:com.tectonic.ui:fieldGroup:example' exist, get all fields whose x-descriptor contain 'urn:alm:descriptor:com.tectonic.ui:fieldGroup:example'.        
+          if(group.startsWith(SpecCapability.fieldGroup) && group.endsWith(FIELDGROUP_EXPAND)){
+            fieldList = fieldList.concat(fields.filter(f => f.capabilities.includes(groupWithoutExpandStatus)).filter(f => !_.isNil(inputFor(f))));
+          }
+
           return <div id={group} key={group}>
-            <FieldGroup defaultExpand={group.split(SpecCapability.fieldGroup)[1].split(':').includes('expand')} groupName={groupName}>
+            <FieldGroup defaultExpand={group.split(SpecCapability.fieldGroup)[1].split(':').includes(FIELDGROUP_EXPAND)} groupName={groupName}>
               <div key={group} className="row">
                 <label className="form-label">{groupName}</label>
                 <div className="co-operand-field-group">
