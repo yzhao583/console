@@ -233,6 +233,12 @@ const AdminNav = () => {
           resource={referenceForModel(VolumeSnapshotClassModel)}
           name={t('public~VolumeSnapshotClasses')}
         />
+       <HrefLink
+          id="dbaasimport"
+          href="/dbaasimport"
+          name={t('public~DBaaS Import')}
+          activePath="/dbaasimport/"
+        />
       </NavSection>
 
       <NavSection
