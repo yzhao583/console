@@ -28,7 +28,7 @@ import {
   RoutePage,
   isRoutePage,
 } from '@console/plugin-sdk';
-import DBaaSImportView from '../components/dbaas/dbaasImportView';
+import DBaasImportPage from '../components/dbaas/dbaasImportPage';
 
 const RedirectComponent = (props) => {
   const to = `/k8s${props.location.pathname}`;
@@ -661,7 +661,7 @@ const AppContents: React.FC<{}> = () => {
 
             <Route path="/k8s/all-namespaces/:plural" exact component={ResourceListPage} />
             <Route path="/k8s/all-namespaces/:plural/:name" component={ResourceDetailsPage} />
-            <Route path="/dbaasimport" exact component={DBaaSImportView} />
+            <Route path="/dbaasimport" exact component={DBaasImportPage} />
 
             {inactivePluginPageRoutes}
 

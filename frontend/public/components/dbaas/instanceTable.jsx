@@ -16,10 +16,7 @@ import {
     Alert,
     AlertActionCloseButton
 } from '@patternfly/react-core';
-
-const currentAuthorization = "YOUR AUTHORIZATION";
-const currentAuthentication = "YOUR AUTHENTICATION";
-const currentNS = "YOUR NAMESPACE";
+import { currentAuthorization, currentAuthentication, currentNS } from './const';
 
 class InstanceTable extends React.Component {
     constructor(props) {
@@ -58,7 +55,7 @@ class InstanceTable extends React.Component {
         let rowList = [];
         if (data) {
             _.forEach(data, rowData => {
-                rowList.push({ cells: [rowData.name, rowData.instanceSizeName, rowData.cloudProvider, rowData.cloudRegion, rowData.id] })
+                rowList.push({ cells: [rowData.name, rowData.instanceSizeName, rowData.providerName, rowData.regionName, rowData.id] })
             })
         };
 
