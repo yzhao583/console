@@ -8,6 +8,7 @@ class InstancesForm extends React.Component {
         this.state = {
             showResults: false,
             instances: [],
+            hasInstanceUpdated: false
         };
         // eslint-disable-next-line
         this.fetchInstances = this.fetchInstances.bind(this);
@@ -16,47 +17,47 @@ class InstancesForm extends React.Component {
     }
 
     componentDidUpdate() {
-        if (this.props.dbaaSServiceStatus && this.state.instances.length == 0) {
-            this.fetchInstances();
+        if (this.props.dbaaSServiceStatus && this.state.instances.length == 0 && !this.state.hasInstanceUpdated) {
+            setInterval(() => {
+                this.fetchInstances();
+            }, 3000)
         }
     }
 
     fetchInstances() {
-        setTimeout(
-            function () {
-                var requestOpts = {
-                    method: "GET",
-                    headers: {
-                        Authorization: "Bearer " + currentAuthorization,
-                        Authentication: "Bearer: " + currentAuthentication,
-                        "Content-Type": "application/json",
-                        Accept: "application/json",
-                    },
-                };
-                fetch(
-                    '/api/kubernetes/apis/dbaas.redhat.com/v1/namespaces/' + currentNS + '/dbaasservices/atlas-dbaas-service',
-                    requestOpts
-                )
-                    .then((response) => response.json())
-                    .then((data) => this.parsePayload(data));
-                this.setState({ showResults: true });
-            }.bind(this),
-            3000
-        );
+        var requestOpts = {
+            method: "GET",
+            headers: {
+                Authorization: "Bearer " + currentAuthorization,
+                Authentication: "Bearer: " + currentAuthentication,
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+        };
+        fetch(
+            '/api/kubernetes/apis/dbaas.redhat.com/v1/namespaces/' + currentNS + '/dbaasservices/atlas-dbaas-service',
+            requestOpts
+        )
+            .then((response) => response.json())
+            .then((data) => this.parsePayload(data));
     };
 
     parsePayload(responseJson) {
         let instances = [];
 
-        responseJson.status.projects.forEach(function (value) {
-            if (value.hasOwnProperty("clusters")) {
-                value.clusters.forEach(function (value) {
+        if (responseJson.status) {
+            responseJson?.status?.projects?.forEach(function (value) {
+                value?.clusters?.forEach(function (value) {
                     instances.push(value);
                 });
-            }
 
-        });
-        this.setState({ instances: instances });
+            });
+            this.setState({
+                instances: instances,
+                hasInstanceUpdated: true,
+                showResults: true
+            });
+        }
     }
 
 

@@ -10,9 +10,9 @@ class CredentialsForm extends React.Component {
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.state = {
-            orgId: "608df5e652e1944293e8584a",
-            orgPublicKey: "ooiocwfa",
-            orgPrivateKey: "54a556dd-3e62-459a-9e14-ebd03300ec1f",
+            orgId: "",
+            orgPublicKey: "",
+            orgPrivateKey: "",
             postResponse: "",
         };
     }
@@ -24,7 +24,7 @@ class CredentialsForm extends React.Component {
             apiVersion: "v1",
             kind: "Secret",
             metadata: {
-                name: "dbaas-vendor-credentials-jary",
+                name: "dbaas-vendor-credentials",
                 namespace: currentNS,
                 labels: {
                     "related-to": "dbaas-operator",
@@ -32,17 +32,15 @@ class CredentialsForm extends React.Component {
                 },
             },
             stringData: {
-                orgId: Buffer.from(this.state.orgId).toString("base64"),
-                publicApiKey: Buffer.from(this.state.orgPublicKey).toString("base64"),
-                privateApiKey: Buffer.from(this.state.orgPrivateKey).toString(
-                    "base64"
-                ),
+                orgId: Buffer.from(this.state.orgId).toString(),
+                publicApiKey: Buffer.from(this.state.orgPublicKey).toString(),
+                privateApiKey: Buffer.from(this.state.orgPrivateKey).toString(),
             },
             type: "Opaque",
         };
 
         //create secret based on user's input
-        k8sGet(SecretModel, "dbaas-vendor-credentials-jary", currentNS, {}).then((oldSecrets) => {
+        k8sGet(SecretModel, "dbaas-vendor-credentials", currentNS, {}).then((oldSecrets) => {
             if (!_.isEmpty(oldSecrets)) {
                 console.log("Secret already exist")
             } else {
@@ -51,7 +49,7 @@ class CredentialsForm extends React.Component {
                         this.setState({ postResponse: nsSecrets })
                     })
                     .catch((err) => {
-                        if (err?.response?.status !== 403) {
+                        if (err?.response?.status != 409) {
                             errorModal({ error: err?.message });
                         }
                     });
@@ -64,12 +62,11 @@ class CredentialsForm extends React.Component {
                             this.setState({ postResponse: nsSecrets })
                         })
                         .catch((err) => {
-                            if (err?.response?.status !== 403) {
+                            if (err?.response?.status != 409) {
                                 errorModal({ error: err?.message });
                             }
                         });
-                }
-                if (err?.response?.status !== 403) {
+                } else {
                     errorModal({ error: err?.message });
                 }
             });
@@ -97,7 +94,7 @@ class CredentialsForm extends React.Component {
                     provider: {
                         name: "MongoDB Atlas",
                     },
-                    credentialsSecretName: "dbaas-vendor-credentials-jary",
+                    credentialsSecretName: "dbaas-vendor-credentials",
                     credentialsSecretNamespace: "dbaas-operator",
                 },
             }),
