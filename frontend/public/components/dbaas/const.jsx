@@ -1,3 +1,3 @@
-const currentNS = "yu-dbaas";
+const currentNS = "please update";
 
 export {currentNS};
