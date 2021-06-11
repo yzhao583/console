@@ -192,3 +192,7 @@
   .extra-bottom-margin {
     margin-bottom: 20px !important;
   }
+
+  .instance-table-container {
+    margin: 20px
+  }

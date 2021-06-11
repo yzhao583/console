@@ -1,6 +1,6 @@
 import React from "react";
 import InstanceTable from "./instanceTable";
-import { currentAuthorization, currentAuthentication, currentNS } from './const';
+import { currentNS } from './const';
 
 class InstancesForm extends React.Component {
     constructor(props) {
@@ -28,8 +28,6 @@ class InstancesForm extends React.Component {
         var requestOpts = {
             method: "GET",
             headers: {
-                Authorization: "Bearer " + currentAuthorization,
-                Authentication: "Bearer: " + currentAuthentication,
                 "Content-Type": "application/json",
                 Accept: "application/json",
             },
@@ -65,7 +63,7 @@ class InstancesForm extends React.Component {
         return (
             <form id="instances-form">
                 <div className="instance-table">
-                    <InstanceTable isLoading={!this.state.showResults} data={this.state.instances} />
+                    <InstanceTable isLoading={!this.state.showResults} data={this.state.instances} isSelectable={false} />
                 </div>
             </form>
         );

@@ -1,0 +1,19 @@
+{
+  "name": "@console/dbaas-plugin",
+  "version": "0.0.0-fixed",
+  "description": "DBAAS plugin provides database related services",
+  "private": true,
+  "scripts": {
+    "coverage": "yarn test --coverage --collectCoverageFrom='[\"packages/dbaas-plugin/src/**\",\"!**/__tests__/**\",\"!packages/dbaas-plugin/src/test/**\"]'",
+    "lint": "yarn --cwd ../.. eslint packages/dbaas-plugin --fix",
+    "test": "yarn --cwd ../.. test packages/dbaas-plugin",
+    "prettier": "yarn --cwd ../.. prettier --write  packages/dbaas-plugin/**/*.{js,jsx,ts,tsx,json}"
+  },
+  "consolePlugin": {
+    "entry": "src/plugin.ts",
+    "exposedModules": {
+      "constants": "src/const.ts",
+      "catalog": "src/catalog"
+    }
+  }
+}

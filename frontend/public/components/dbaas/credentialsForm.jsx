@@ -2,7 +2,7 @@ import React from "react";
 import * as _ from 'lodash-es';
 import { k8sGet, k8sCreate } from '@console/internal/module/k8s';
 import { SecretModel } from '@console/internal/models';
-import { currentAuthorization, currentAuthentication, currentNS } from './const';
+import { currentNS } from './const';
 import { errorModal } from '@console/internal/components/modals';
 
 class CredentialsForm extends React.Component {
@@ -74,8 +74,6 @@ class CredentialsForm extends React.Component {
         let requestOpts = {
             method: "POST",
             headers: {
-                Authorization: "Bearer " + process.env.REACT_APP_OCP_API_AUTHORIZATION,
-                Authentication: "Bearer: " + currentAuthentication,
                 "Content-Type": "application/json",
                 Accept: "application/json",
             },

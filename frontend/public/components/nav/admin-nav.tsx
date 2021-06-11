@@ -234,10 +234,10 @@ const AdminNav = () => {
           name={t('public~VolumeSnapshotClasses')}
         />
        <HrefLink
-          id="dbaasimport"
-          href="/dbaasimport"
-          name={t('public~DBaaS Import')}
-          activePath="/dbaasimport/"
+          id="dbaasConnectDBVender"
+          href="/dbaas/connect-db-account/"
+          name={t('public~DBaaS Connect Database Account')}
+          activePath="/dbaas/connect-db-account/"
         />
       </NavSection>
 

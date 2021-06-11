@@ -58,6 +58,7 @@ i18n
         'details-page',
         'devconsole',
         'dropdown',
+        'dbaas-plugin',
         'editor',
         'email-receiver-form',
         'environment',

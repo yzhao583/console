@@ -1,5 +1,3 @@
-const currentAuthorization = "PLEASE UPDATE";
-const currentAuthentication = "PLEASE UPDATE";
-const currentNS = "PLEASE UPDATE";
+const currentNS = "yu-dbaas";
 
-export {currentAuthorization, currentAuthentication, currentNS};
+export {currentNS};

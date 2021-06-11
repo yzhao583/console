@@ -17,7 +17,6 @@ import {
     AlertActionCloseButton
 } from '@patternfly/react-core';
 import { currentAuthorization, currentAuthentication, currentNS } from './const';
-
 class InstanceTable extends React.Component {
     constructor(props) {
         super(props);
@@ -84,9 +83,6 @@ class InstanceTable extends React.Component {
         let requestOpts = {
             method: "PATCH",
             headers: {
-                Authorization: "Bearer " + currentAuthorization,
-                Authentication:
-                    "Bearer: " + currentAuthentication,
                 "Content-Type": "application/json-patch+json",
                 Accept: "application/json",
             },
@@ -97,7 +93,7 @@ class InstanceTable extends React.Component {
             requestOpts
         )
             .then((response) => response.json())
-            .then((data) => this.setState({ 
+            .then((data) => this.setState({
                 postResponse: data,
                 alert: {
                     isActive: true,
@@ -112,14 +108,15 @@ class InstanceTable extends React.Component {
         this.submitInstances();
     };
 
-    closeAlert(){
-        this.setState({alert: {isActive: false}})
+    closeAlert() {
+        this.setState({ alert: { isActive: false } })
     }
 
     render() {
         const { columns, rows, alert } = this.state;
+        const { isSelectable, isLoading } = this.props;
 
-        if (this.props.isLoading) {
+        if (isLoading) {
             return (
                 <EmptyState>
                     <EmptyStateIcon variant="container" component={Spinner} />
@@ -134,8 +131,8 @@ class InstanceTable extends React.Component {
             <div>
                 {this.state.alert.isActive ? (<Alert variant={alert.type} title={alert.msg} actionClose={<AlertActionCloseButton onClose={this.closeAlert} />} />) : null}
                 <Table
-                    onSelect={this.onSelect}
-                    selectVariant={RowSelectVariant.radio}
+                    onSelect={isSelectable ? this.onSelect : null}
+                    selectVariant={isSelectable ? RowSelectVariant.radio : null}
                     aria-label="Instance Table"
                     cells={columns}
                     rows={rows}
@@ -145,11 +142,14 @@ class InstanceTable extends React.Component {
                 </Table>
                 <br />
                 <br />
-                <div className={this.props.isLoading ? "hide" : null}>
-                    <Button id="instance-select-button" variant="primary" onClick={this.handleSubmit} isDisabled={_.isEmpty(this.state.selectedInstance)}>
-                        Connect
-          </Button>
-                </div>
+                {isSelectable ?
+                    <div className={isLoading ? "hide" : null}>
+                        <Button id="instance-select-button" variant="primary" onClick={this.handleSubmit} isDisabled={_.isEmpty(this.state.selectedInstance)}>
+                            Connect
+                    </Button>
+                    </div>
+                    :
+                    null}
             </div>
         );
     }

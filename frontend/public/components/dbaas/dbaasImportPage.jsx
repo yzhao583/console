@@ -45,14 +45,14 @@ class DBaasImportPage extends React.Component {
                     <div className="section-padding-top">&nbsp;</div>
                     <div className="section-padding-left">&nbsp;</div>
                     <div className="section-breadcrumb">
-                        <span className="breadcrumb-link">DBaaS Import</span>
+                        <span className="breadcrumb-link">DBaaS Connect DataBase Account</span>
                         <span className="breadcrumb-chevron"> > </span>
-                        Vendor Details
+                        Database Provider Details
                     </div>
-                    <div className="section-title extra-bottom-margin">DBaaS Import</div>
+                    <div className="section-title extra-bottom-margin">DBaaS Connect DataBase Account</div>
                 </div>
                 <Tabs activeKey={activeTabKey} onSelect={this.handleTabClick} className="extra-bottom-margin">
-                    <Tab eventKey={0} title={<TabTitleText>Vendor</TabTitleText>}>
+                    <Tab eventKey={0} title={<TabTitleText>Database Provider</TabTitleText>}>
                         <section
                             className="pf-c-tab-content pf-m-padding"
                             id="tab1-panel"
@@ -61,7 +61,7 @@ class DBaasImportPage extends React.Component {
                         >
                             <div className="pf-c-tab-content__body">
                                 <div className="section-title">
-                                    Vendor Selection
+                                    Select Database Provider
                                 </div>
                                 <VendorForm setActiveTab={this.setActiveTab} />
                             </div>
@@ -91,7 +91,7 @@ class DBaasImportPage extends React.Component {
                         >
                             <div className="pf-c-tab-content__body">
                                 <div className="section-title">
-                                    Database Instances Selection
+                                    Database Instances
                                 </div>
                                 <InstancesForm dbaaSServiceStatus={isDBaaSServiceUp} />
                             </div>
