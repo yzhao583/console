@@ -1,6 +1,6 @@
 import React from "react";
 import InstanceTable from "./instanceTable";
-import { currentNS } from './const';
+import { getActiveNamespace } from '@console/internal/actions/ui';
 
 class InstancesForm extends React.Component {
     constructor(props) {
@@ -8,7 +8,8 @@ class InstancesForm extends React.Component {
         this.state = {
             showResults: false,
             instances: [],
-            hasInstanceUpdated: false
+            hasInstanceUpdated: false,
+            currentNS: getActiveNamespace()
         };
         // eslint-disable-next-line
         this.fetchInstances = this.fetchInstances.bind(this);
@@ -33,7 +34,7 @@ class InstancesForm extends React.Component {
             },
         };
         fetch(
-            '/api/kubernetes/apis/dbaas.redhat.com/v1/namespaces/' + currentNS + '/dbaasservices/atlas-dbaas-service',
+            '/api/kubernetes/apis/dbaas.redhat.com/v1/namespaces/' + this.state.currentNS + '/dbaasservices/atlas-dbaas-service',
             requestOpts
         )
             .then((response) => response.json())

@@ -16,7 +16,8 @@ import {
     Alert,
     AlertActionCloseButton
 } from '@patternfly/react-core';
-import { currentAuthorization, currentAuthentication, currentNS } from './const';
+import { getActiveNamespace } from '@console/internal/actions/ui';
+
 class InstanceTable extends React.Component {
     constructor(props) {
         super(props);
@@ -34,7 +35,8 @@ class InstanceTable extends React.Component {
                 isActive: false,
                 msg: "",
                 type: ""
-            }
+            },
+            currentNS: getActiveNamespace()
         };
         this.onSelect = this.onSelect.bind(this);
         this.getRows = this.getRows.bind(this);
@@ -89,7 +91,7 @@ class InstanceTable extends React.Component {
             body: JSON.stringify(patch),
         };
         fetch(
-            '/api/kubernetes/apis/dbaas.redhat.com/v1/namespaces/' + currentNS + '/dbaasservices/atlas-dbaas-service',
+            '/api/kubernetes/apis/dbaas.redhat.com/v1/namespaces/' + this.state.currentNS + '/dbaasservices/atlas-dbaas-service',
             requestOpts
         )
             .then((response) => response.json())

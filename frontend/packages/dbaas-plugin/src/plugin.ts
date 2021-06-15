@@ -34,7 +34,7 @@ const plugin: Plugin<ConsumedExtensions> = [
       loader: async () =>
         (
           await import(
-            './components/service-list/ServiceListPage' /* webpackChunkName: "services-kafka-plugin-releases-kafka-page" */
+            './components/service-list/ServiceListPage' /* webpackChunkName: "dbaas-plugin-connected-db-provider-page" */
           )
         ).default,
     },

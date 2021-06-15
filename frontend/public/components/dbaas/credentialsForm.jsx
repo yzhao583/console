@@ -2,7 +2,7 @@ import React from "react";
 import * as _ from 'lodash-es';
 import { k8sGet, k8sCreate } from '@console/internal/module/k8s';
 import { SecretModel } from '@console/internal/models';
-import { currentNS } from './const';
+import { getActiveNamespace } from '@console/internal/actions/ui';
 import { errorModal } from '@console/internal/components/modals';
 
 class CredentialsForm extends React.Component {
@@ -14,6 +14,7 @@ class CredentialsForm extends React.Component {
             orgPublicKey: "",
             orgPrivateKey: "",
             postResponse: "",
+            currentNS: getActiveNamespace()
         };
     }
 
@@ -25,7 +26,7 @@ class CredentialsForm extends React.Component {
             kind: "Secret",
             metadata: {
                 name: "dbaas-vendor-credentials",
-                namespace: currentNS,
+                namespace: this.state.currentNS,
                 labels: {
                     "related-to": "dbaas-operator",
                     type: "dbaas-vendor-credentials",
@@ -40,7 +41,7 @@ class CredentialsForm extends React.Component {
         };
 
         //create secret based on user's input
-        k8sGet(SecretModel, "dbaas-vendor-credentials", currentNS, {}).then((oldSecrets) => {
+        k8sGet(SecretModel, "dbaas-vendor-credentials", this.state.currentNS, {}).then((oldSecrets) => {
             if (!_.isEmpty(oldSecrets)) {
                 console.log("Secret already exist")
             } else {
@@ -82,7 +83,7 @@ class CredentialsForm extends React.Component {
                 kind: "DBaaSService",
                 metadata: {
                     name: "atlas-dbaas-service",
-                    namespace: currentNS,
+                    namespace: this.state.currentNS,
                     labels: {
                         "related-to": "dbaas-operator",
                         type: "dbaas-vendor-service",
@@ -98,7 +99,7 @@ class CredentialsForm extends React.Component {
             }),
         };
         fetch(
-            '/api/kubernetes/apis/dbaas.redhat.com/v1/namespaces/' + currentNS + '/dbaasservices',
+            '/api/kubernetes/apis/dbaas.redhat.com/v1/namespaces/' + this.state.currentNS + '/dbaasservices',
             requestOpts
         )
             .then((response) => response.json())

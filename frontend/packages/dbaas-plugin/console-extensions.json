@@ -13,7 +13,7 @@
   {
     "type": "dev-console.add/action",
     "flags": {
-      "required": ["DBAAS_FLAG"]
+      "required": []
     },
     "properties": {
       "id": "dbaasAddAction",
@@ -38,7 +38,7 @@
       "typeDescription": "%dbaas-plugin~DBaaS%"
     },
     "flags": {
-      "required": ["DBAAS_FLAG"]
+      "required": []
     }
   },
   {
@@ -49,7 +49,7 @@
       "provider": { "$codeRef": "catalog.dbaasProvider" }
     },
     "flags": {
-      "required": ["DBAAS_FLAG"]
+      "required": []
     }
   }
 ]
